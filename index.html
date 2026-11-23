@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title> Hero • GYM</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <!-- الهيدر العلوي مع أيقونة التنبيهات والعداد -->
+    <header class="topbar">
+      <div>
+        <div class="brand-title">⚡ Hero • GYM</div>
+        <div class="brand-sub">إدارة المشتركين والبطولات</div>
+      </div>
+      
+      <div class="top-actions">
+        <button class="notif-btn" onclick="openPage('alertsPage')" title="التنبيهات">
+          🔔
+          <span id="notifCountBadge" class="notif-badge">0</span>
+        </button>
+        <button class="icon-pill" onclick="resetDemo()">إعادة ضبط</button>
+      </div>
+      
+    </header>
+
+    <div class="gym-hero-banner">
+  <img
+    src="https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=1200&q=85](https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=1800&q=85"
+    alt="صورة الجيم"
+    loading="lazy"
+  />
+</div>
+
+    
+    <!-- صفحة 1: المشتركين والكروت -->
+    <section id="membersPage" class="page active">
+      <div class="page-header">
+        <h2>كروت المشتركين والحضور</h2>
+        <p>سجل الحضور بضغطة أو افتح كارت أي متدرب</p>
+      </div>
+
+      <div class="mini-stats">
+        <div class="mini-stat"><strong id="stTotal">0</strong><small>الكل</small></div>
+        <div class="mini-stat"><strong id="stActive" class="c-green">0</strong><small>نشط</small></div>
+        <div class="mini-stat"><strong id="stSoon" class="c-yellow">0</strong><small>قرب يخلص</small></div>
+        <div class="mini-stat"><strong id="stExpired" class="c-red">0</strong><small>منتهي</small></div>
+      </div>
+
+      <div class="search-row">
+        <input type="text" id="searchInput" placeholder="ابحث بالاسم أو الرقم..." oninput="renderMembers()" />
+        <select id="filterSelect" onchange="renderMembers()">
+          <option value="all">الكل</option>
+          <option value="active">نشط</option>
+          <option value="soon">قرب ينتهي</option>
+          <option value="expired">منتهي</option>
+        </select>
+      </div>
+
+      <div id="membersList"></div>
+    </section>
+
+    <!-- صفحة 2: تسجيل مشترك جديد -->
+    <section id="addPage" class="page">
+      <div class="page-header">
+        <h2>تسجيل مشترك جديد</h2>
+        <p>تاريخ الانتهاء يتحسب تلقائياً ويطلع له كارت فوري</p>
+      </div>
+
+      <form class="form-box" onsubmit="addMember(event)">
+        <div class="field">
+          <label>الاسم بالكامل *</label>
+          <input type="text" id="mName" required placeholder="Name" />
+        </div>
+        <div class="field">
+          <label>رقم الموبايل (واتساب) *</label>
+          <input type="tel" id="mPhone" required placeholder="your phone" />
+        </div>
+        <div class="field">
+          <label>مدة الاشتراك</label>
+          <select id="mDuration" onchange="calcEnd()">
+            <option value="30" selected>شهر (30 يوم)</option>
+            <option value="15">نصف شهر (15 يوم)</option>
+            <option value="90">3 شهور (90 يوم)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>تاريخ البدء *</label>
+          <input type="date" id="mStart" required onchange="calcEnd()" />
+        </div>
+        <div class="field">
+          <label>تاريخ الانتهاء *</label>
+          <input type="date" id="mEnd" required />
+        </div>
+        <div class="field">
+          <label>صورة المشترك (اختياري)</label>
+          <input type="file" id="mPhoto" accept="image/*" />
+        </div>
+        <button type="submit" class="btn">➕ حفظ وإصدار الكارت</button>
+      </form>
+    </section>
+
+        <!-- صفحة 3: البطولة والألعاب -->
+    <section id="tourPage" class="page">
+      <div class="page-header">
+        <h2>بطولات وألعاب الجيم</h2>
+        <p>سجل اسمك وسنك، اختار اللعبة أو التحدي، واللي يخلص نظامه أسرع يفوز</p>
+      </div>
+
+      <div id="playerLoginBox" class="form-box mb-16">
+        <strong class="c-primary">تسجيل دخول المتسابق</strong>
+        <form onsubmit="submitPlayerLogin(event)" class="form-box" style="padding:0; border:none; background:none;">
+          <div class="field">
+            <label>اسمك *</label>
+            <input type="text" id="plName" required placeholder=Name />
+          </div>
+          <div class="field">
+            <label>سنك *</label>
+            <input type="number" id="plAge" required min="8" max="80" placeholder=enter />
+          </div>
+          <button type="submit" class="btn btn-success">تم ✅</button>
+        </form>
+      </div>
+
+      <div id="challengeArenaBox" style="display:none;">
+        <div class="tour-hero">
+          <div>
+            <strong id="activePlayerInfo" class="c-primary"></strong>
+            <div class="muted-sm">اختر اللعبة أو التحدي وابدأ العداد</div>
+          </div>
+          <button class="btn btn-sm btn-ghost" onclick="logoutPlayer()">تغيير اللاعب</button>
+        </div>
+
+        <form class="form-box mb-16" onsubmit="finishChallenge(event)">
+          <div class="field">
+            <label>نوع المشاركة</label>
+            <select id="chMode">
+              <option value="بطولة سرعة">🏆 بطولة (الأسرع في إنهاء النظام يفوز)</option>
+              <option value="تمرينة فردية">💪 تمرينة لوحدك (قياس وقتك)</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>اختر اللعبة / التحدي *</label>
+            <select id="chWorkout">
+              <option value="تحدي الضغط (50 عدة)">🔥 تحدي الضغط (50 عدة)</option>
+              <option value="تحدي العقلة (أقصى عدات)">🏋️‍♂️ تحدي العقلة (أقصى عدات)</option>
+              <option value="تحدي البلانك (تحمل)">⏱️ تحدي البلانك (تحمل)</option>
+              <option value="تحدي السكوات (60 عدة)">🦵 تحدي السكوات (60 عدة)</option>
+              <option value="تحدي البنش برس (أوزان)">💪 تحدي البنش برس (أوزان)</option>
+              <option value="بطولة المتوازي (Dip)">⚡ بطولة المتوازي (Dip)</option>
+              <option value="نظام تمرين كامل (Circuit)">🚀 نظام تمرين كامل (Circuit)</option>
+            </select>
+          </div>
+
+          <div class="att-strip">
+            <div style="grid-column: 1 / -1;">
+              <span id="liveTimer" class="c-primary" style="font-size:1.4rem;">00:00</span>
+              <small>وقت إنهاء النظام (الأقل وقتاً هو الأسرع)</small>
+            </div>
+          </div>
+
+          <div class="card-btns">
+            <button type="button" class="btn btn-sm btn-success" onclick="startTimer()">▶️ ابدأ الوقت</button>
+            <button type="button" class="btn btn-sm btn-ghost" onclick="stopTimer()">⏸️ إيقاف</button>
+            <button type="button" class="btn btn-sm btn-ghost" onclick="resetTimer()">🔄 تصفير</button>
+          </div>
+
+          <button type="submit" class="btn mt-10">🏁 أنهيت النظام (سجل نتيجتي)</button>
+        </form>
+      </div>
+
+      <h3 style="margin-bottom:10px; font-size:1rem;">🥇 جدول الأسرع (الأول = الأسرع)</h3>
+      <div id="leaderList"></div>
+    </section>
+
+
+      <div id="leaderList"></div>
+    </section>
+
+    <!-- صفحة 4: التنبيهات -->
+    <section id="alertsPage" class="page">
+      <div class="page-header">
+        <h2>تنبيهات الاشتراكات</h2>
+        <p>الاشتراكات المنتهية أو المتبقي لها 3 أيام أو أقل</p>
+      </div>
+      <div id="alertsPageList"></div>
+      <button class="btn btn-ghost w-100 mt-10" onclick="openPage('membersPage')">⬅️ رجوع للمشتركين</button>
+    </section>
+
+    <!-- نافذة الكارت المكبر -->
+    <div id="cardModal" class="modal" onclick="if(event.target.id==='cardModal') this.classList.remove('open')">
+      <div class="id-card" onclick="event.stopPropagation()">
+        <div id="cAvatar" class="avatar"></div>
+        <h3 id="cName"></h3>
+        <div id="cBadge"></div>
+        <div class="att-strip mt-14">
+          <div><span id="cPresent" class="c-green">0</span><small>حضور</small></div>
+          <div><span id="cAbsent" class="c-red">0</span><small>غياب</small></div>
+          <div><span id="cLeft" class="c-primary">0</span><small>متبقي</small></div>
+        </div>
+        <p id="cDates" class="muted-sm mb-14"></p>
+        <button class="btn btn-ghost w-100" onclick="document.getElementById('cardModal').classList.remove('open')">إغلاق</button>
+      </div>
+    </div>
+
+    <!-- الشريط السفلي للتنقل -->
+    <nav class="bottom-nav">
+      <button class="nav-btn active" data-page="membersPage" onclick="openPage('membersPage')">
+        <span class="emo">🪪</span><span>المشتركين</span>
+      </button>
+      <button class="nav-btn" data-page="addPage" onclick="openPage('addPage')">
+        <span class="emo">➕</span><span>تسجيل جديد</span>
+      </button>
+      <button class="nav-btn" data-page="tourPage" onclick="openPage('tourPage')">
+        <span class="emo">🏆</span><span>البطولة</span>
+      </button>
+    </nav>
+  </div>
+
+  <script src="main.js"></script>
+  <!-- نافذة تأكيد مخصصة بدل رسالة المتصفح البيضاء -->
+<div id="confirmModal" class="modal" onclick="closeConfirm(false)">
+  <div class="id-card confirm-box" onclick="event.stopPropagation()">
+    <div id="confirmIcon" class="confirm-icon">⚠️</div>
+    <h3 id="confirmTitle">تأكيد العملية</h3>
+    <p id="confirmText" class="muted-sm confirm-msg"></p>
+    <div class="card-btns">
+      <button id="confirmYesBtn" class="btn btn-sm btn-success">تأكيد</button>
+      <button class="btn btn-sm btn-ghost" onclick="closeConfirm(false)">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+</body>
+        </html>
+        
